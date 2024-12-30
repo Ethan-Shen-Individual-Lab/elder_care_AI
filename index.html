@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>乐伴AI - 智慧陪伴，温暖每一天</title>
+    
+    <!-- 添加 Coze 聊天功能 SDK -->
+    <script src="https://lf-cdn.coze.cn/obj/unpkg/flow-platform/chat-app-sdk/1.1.0-beta.0/libs/cn/index.js"></script>
+    
+    <!-- 引入CSS文件 -->
+    <link rel="stylesheet" href="styles/navigation.css">
+    <link rel="stylesheet" href="styles/animations.css">
+    <link rel="stylesheet" href="styles/upload.css">
+    <link rel="stylesheet" href="styles/toast.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', '思源黑体', sans-serif;
+            background-color: #fff;
+            color: #525252;
+            overflow-x: hidden;
+        }
+        
+        /* 修改基础配色 */
+        :root {
+            --primary-color: #D84545;
+            --secondary-color: #C13E3E;
+            --accent-color: #B83535;
+            --text-color: #4A4A4A;
+            --light-bg: #FFF0F0;
+            --warm-gradient: linear-gradient(135deg, #D84545 0%, #B83535 100%);
+        }
+        
+        /* Hero区域 */
+        .hero-section {
+            min-height: 100vh;
+            background: url('./主页背景.png') no-repeat center center;
+            background-size: cover;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 80px 20px 40px;
+        }
+        
+        /* 调整遮罩层让文字更清晰但背景更明显 */
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                rgba(255, 255, 255, 0.75) 0%,
+                rgba(255, 255, 255, 0.70) 50%,
+                rgba(255, 255, 255, 0.75) 100%
+            );
+            z-index: 1;
+        }
+        
+        .hero-section > * {
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* 加强文字对比度 */
+        .hero-title {
+            font-size: 56px;
+            font-weight: 800;
+            color: var(--primary-color);
+            margin-bottom: 24px;
+            line-height: 1.2;
+            text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.8);
+        }
+        
+        .hero-subtitle {
+            font-size: 22px;
+            color: var(--text-color);
+            max-width: 700px;
+            margin: 0 auto 48px;
+            line-height: 1.6;
+            text-shadow: 1px 1px 4px rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+            color: #333;
+        }
+        
+        /* 上传区域 */
+        .upload-container {
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 24px;
+            padding: 48px;
+            box-shadow: 0 10px 40px rgba(255, 107, 107, 0.2);
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: left;
+            border: 1px solid rgba(255, 107, 107, 0.15);
+            backdrop-filter: blur(5px);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+        
+        /* 特性展示区 */
+        .features-section {
+            padding: 120px 20px;
+            background: white;
+        }
+        
+        .section-title {
+            font-size: 40px;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 80px;
+            text-shadow: 2px 2px 6px rgba(255, 255, 255, 1);
+            position: relative;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        /* 使用统计区 */
+        .stats-section {
+            background: var(--warm-gradient);
+            color: white;
+            padding: 100px 20px;
+            text-align: center;
+            box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .stat-item {
+            padding: 20px;
+        }
+        
+        .stat-number {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+        
+        .stat-label {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+        
+        /* 学习路径区 */
+        .learning-path {
+            padding: 120px 20px;
+            background: url('./图片 1.jpg') no-repeat center center;
+            background-size: cover;
+            position: relative;
+        }
+        
+        /* 调整遮罩层透明度和渐变 */
+        .learning-path::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                rgba(255, 255, 255, 0.65) 0%,
+                rgba(255, 255, 255, 0.60) 50%,
+                rgba(255, 255, 255, 0.65) 100%
+            );
+            z-index: 1;
+        }
+        
+        .learning-path > * {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .path-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        /* 调整卡片样式以适应新背景 */
+        .step-card {
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 4px 20px rgba(216, 69, 69, 0.2);
+            display: flex;
+            gap: 24px;
+            align-items: center;
+            transform: translateX(-100px);
+            opacity: 0;
+            transition: all 0.6s ease;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(216, 69, 69, 0.15);
+        }
+        
+        .step-card.visible {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        
+        .step-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-color);
+            min-width: 48px;
+            height: 48px;
+            border-radius: 24px;
+            background: rgba(216, 69, 69, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(184, 53, 53, 0.25);
+        }
+        
+        .step-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(184, 53, 53, 0.35);
+            background: rgba(255, 255, 255, 0.9);
+        }
+        
+        .step-content h3 {
+            color: var(--primary-color);
+            font-size: 20px;
+            margin-bottom: 8px;
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+        }
+        
+        .step-content p {
+            color: var(--text-color);
+            font-size: 16px;
+            line-height: 1.6;
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.6);
+        }
+        
+        /* 导航栏样式更新 */
+        .nav-container {
+            background: rgba(216, 69, 69, 0.85);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* 滚动时导航栏样式 */
+        .nav-container.scrolled {
+            background: rgba(184, 53, 53, 0.95);
+            box-shadow: 0 4px 30px rgba(255, 107, 107, 0.15);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        
+        /* 导航链接样式优化 */
+        .nav-links a {
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            padding: 8px 0;
+            position: relative;
+        }
+        
+        .nav-links a:hover {
+            color: white;
+            transform: translateY(-1px);
+        }
+        
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.8);
+            transition: width 0.3s ease;
+        }
+        
+        /* 按钮样式更新 */
+        .nav-button {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 10px 24px;
+            border-radius: 50px;
+            cursor: pointer;
+        }
+        
+        .nav-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .chat-button {
+            background: var(--warm-gradient);
+            font-size: 20px;
+            padding: 24px 48px;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(216, 69, 69, 0.4);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+            margin-left: 0;
+        }
+        
+        .chat-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(184, 53, 53, 0.5);
+        }
+        
+        .chat-tip {
+            color: var(--text-color);
+            font-size: 18px;
+            opacity: 0.8;
+            margin: 0;
+            white-space: nowrap;
+            padding-right: 20px;
+        }
+        
+        /* 调整内容布局 */
+        .hero-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* 品牌名称样式 */
+        .nav-brand {
+            font-size: 24px;
+            font-weight: 600;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* 特性展示区的图标 */
+        .feature-icon svg {
+            fill: var(--primary-color);
+        }
+        
+        /* 添加图标悬停效果 */
+        .feature-card:hover .feature-icon svg {
+            fill: var(--accent-color);
+            transform: scale(1.1);
+            transition: all 0.3s ease;
+        }
+        
+        /* 特性卡片样式 */
+        .feature-card {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 4px 20px rgba(216, 69, 69, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(216, 69, 69, 0.15);
+        }
+        
+        /* 图标容器样式 */
+        .feature-icon {
+            width: 64px;
+            height: 64px;
+            background: rgba(216, 69, 69, 0.1);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover .feature-icon {
+            background: rgba(216, 69, 69, 0.15);
+        }
+        
+        /* 功能详解区样式优化 */
+        .features-detail-section {
+            padding: 120px 20px;
+            background: url('./背景图2.png') no-repeat center center;
+            background-size: cover;
+            position: relative;
+        }
+        
+        /* 添加遮罩层 */
+        .features-detail-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                rgba(255, 255, 255, 0.65) 0%,
+                rgba(255, 255, 255, 0.60) 50%,
+                rgba(255, 255, 255, 0.65) 100%
+            );
+            z-index: 1;
+        }
+
+        .features-detail-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            padding: 20px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* 调整标题层级 */
+        .features-detail-section .section-title {
+            position: relative;
+            z-index: 2;
+        }
+
+        .feature-detail-card {
+            background: rgba(255, 255, 255, 0.90);
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow: 0 4px 20px rgba(216, 69, 69, 0.2);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(8px);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            border: 1px solid rgba(216, 69, 69, 0.15);
+        }
+        
+        .feature-detail-card:hover {
+            transform: scale(1.03);
+            box-shadow: 0 8px 30px rgba(216, 69, 69, 0.3);
+            background: rgba(255, 255, 255, 0.95);
+        }
+        
+        .feature-detail-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .feature-detail-header .feature-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(216, 69, 69, 0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .feature-detail-header h3 {
+            color: var(--primary-color);
+            font-size: 22px;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .example-dialog {
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 16px;
+            padding: 24px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(5px);
+        }
+        
+        .dialog-section {
+            margin-bottom: 20px;
+        }
+        
+        .dialog-section:last-child {
+            margin-bottom: 0;
+        }
+        
+        .dialog-label {
+            color: var(--primary-color);
+            font-weight: 500;
+            margin-bottom: 12px;
+            display: block;
+        }
+        
+        .dialog-content {
+            padding-left: 16px;
+            border-left: 3px solid var(--primary-color);
+        }
+        
+        .dialog-content p {
+            margin: 8px 0;
+            color: var(--text-color);
+            font-size: 15px;
+        }
+        
+        .workflow-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .workflow-list li {
+            margin: 8px 0;
+            padding-left: 24px;
+            position: relative;
+            font-size: 15px;
+        }
+        
+        .workflow-list li::before {
+            content: '•';
+            color: var(--primary-color);
+            position: absolute;
+            left: 8px;
+        }
+        
+        /* 响应式布局 */
+        @media (max-width: 1024px) {
+            .features-detail-container {
+                grid-template-columns: repeat(2, 1fr); /* 平板端每行2个 */
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .features-detail-container {
+                grid-template-columns: 1fr; /* 手机端每行1个 */
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="nav-container">
+        <div class="nav-brand">乐伴AI</div>
+        <div class="nav-links">
+            <a href="#features">服务特色</a>
+            <a href="#stats">温暖陪伴</a>
+            <a href="#path">使用指南</a>
+            <button class="nav-button">开始体验</button>
+        </div>
+    </nav>
+    
+    <!-- Hero区域 -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <h1 class="hero-title">智慧陪伴<br>让生活更有温度</h1>
+            <p class="hero-subtitle">
+                专为长者打造的AI智能伙伴，集情感陪伴、生活助手、健康关怀于一体。
+                让科技带来温暖，让沟通无障碍，让每一天都充满欢声笑语。
+            </p>
+            
+            <div class="upload-container">
+                <button class="chat-button" onclick="initChat()">
+                    <i class="chat-icon"></i>
+                    点击开始语音聊天
+                </button>
+                <p class="chat-tip">轻松交谈，温暖相伴</p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 特性展示区 -->
+    <section id="features" class="features-section">
+        <h2 class="section-title">全方位的智慧陪伴</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7zm2.85 11.1l-.85.6V16h-4v-2.3l-.85-.6C7.8 12.16 7 10.63 7 9c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.63-.8 3.16-2.15 4.1z"/>
+                    </svg>
+                </div>
+                <h3 class="feature-title">生活好帮手</h3>
+                <p class="feature-description">烹饪指导、天气提醒、新闻资讯、健康建议，让生活更便捷</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/>
+                    </svg>
+                </div>
+                <h3 class="feature-title">温暖话伴侣</h3>
+                <p class="feature-description">分享故事、畅聊兴趣、情感交流，做您的知心好友</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-7-2h2V7h-4v2h2z"/>
+                    </svg>
+                </div>
+                <h3 class="feature-title">智能小助理</h3>
+                <p class="feature-description">手机指导、出行帮助、安全提醒，让科技更贴心</p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 使用统计 -->
+    <section id="stats" class="stats-section">
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-number">50万+</div>
+                <div class="stat-label">暖心陪伴</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">99%</div>
+                <div class="stat-label">长辈满意度</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">300万+</div>
+                <div class="stat-label">温暖对话</div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 功能详解区域 -->
+    <section id="features-detail" class="features-detail-section">
+        <h2 class="section-title">智能对话场景</h2>
+        <div class="features-detail-container">
+            <!-- 1. 烹饪与食谱 -->
+            <div class="feature-detail-card">
+                <div class="feature-detail-header">
+                    <div class="feature-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M8.1 13.34l2.83-2.83L3.91 3.5c-1.56 1.56-1.56 4.09 0 5.66l4.19 4.18zm6.78-1.81c1.53.71 3.68.21 5.27-1.38 1.91-1.91 2.28-4.65.81-6.12-1.46-1.46-4.2-1.1-6.12.81-1.59 1.59-2.09 3.74-1.38 5.27L3.7 19.87l1.41 1.41L12 14.41l6.88 6.88 1.41-1.41L13.41 13l1.47-1.47z"/>
+                        </svg>
+                    </div>
+                    <h3>烹饪与食谱</h3>
+                </div>
+                <div class="example-dialog">
+                    <div class="dialog-section">
+                        <span class="dialog-label">您可以这样问：</span>
+                        <div class="dialog-content">
+                            <p>"今天想做鸡汤，有什么好的食谱推荐？"</p>
+                            <p>"怎么用电饭煲煮粥？"</p>
+                        </div>
+                    </div>
+                    <div class="dialog-section">
+                        <span class="dialog-label">乐伴AI会：</span>
+                        <ul class="workflow-list">
+                            <li>自动识别食谱关键词，提供详细步骤指导</li>
+                            <li>根据具体菜品和器具，提供针对性建议</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. 健康与医疗 -->
+            <div class="feature-detail-card">
+                <div class="feature-detail-header">
+                    <div class="feature-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19 3H5c-1.1 0-1.99.9-1.99 2L3 19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-1 11h-4v4h-4v-4H6v-4h4V6h4v4h4v4z"/>
+                        </svg>
+                    </div>
+                    <h3>健康与医疗</h3>
+                </div>
+                <div class="example-dialog">
+                    <div class="dialog-section">
+                        <span class="dialog-label">您可以这样问：</span>
+                        <div class="dialog-content">
+                            <p>"高血压应该怎么控制饮食？"</p>
+                            <p>"感冒了应该吃什么药？"</p>
+                        </div>
+                    </div>
+                    <div class="dialog-section">
+                        <span class="dialog-label">乐伴AI会：</span>
+                        <ul class="workflow-list">
+                            <li>提供基本的健康知识和饮食建议</li>
+                            <li>引导用户咨询专业医生，避免提供医疗建议</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. 回忆与故事 -->
+            <div class="feature-detail-card">
+                <div class="feature-detail-header">
+                    <div class="feature-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-14h2v7h-2zm0 8h2v2h-2z"/>
+                        </svg>
+                    </div>
+                    <h3>回忆与故事</h3>
+                </div>
+                <div class="example-dialog">
+                    <div class="dialog-section">
+                        <span class="dialog-label">您可以这样问：</span>
+                        <div class="dialog-content">
+                            <p>"你知道我年轻时候的那个故事吗？"</p>
+                            <p>"帮我回忆一下我小时候的事情。"</p>
+                        </div>
+                    </div>
+                    <div class="dialog-section">
+                        <span class="dialog-label">乐伴AI会：</span>
+                        <ul class="workflow-list">
+                            <li>引导用户分享过去的故事，提供积极的反馈</li>
+                            <li>通过提问激发用户的回忆，增强情感连接</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. 日常生活 -->
+            <div class="feature-detail-card">
+                <div class="feature-detail-header">
+                    <div class="feature-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M20 3h-1V1h-2v2H7V1H5v2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H4V8h16v13z"/>
+                        </svg>
+                    </div>
+                    <h3>日常生活</h3>
+                </div>
+                <div class="example-dialog">
+                    <div class="dialog-section">
+                        <span class="dialog-label">您可以这样问：</span>
+                        <div class="dialog-content">
+                            <p>"今天的天气怎么样？"</p>
+                            <p>"下午几点有电视节目？"</p>
+                        </div>
+                    </div>
+                    <div class="dialog-section">
+                        <span class="dialog-label">乐伴AI会：</span>
+                        <ul class="workflow-list">
+                            <li>提供实时的天气预报、新闻摘要等信息</li>
+                            <li>根据用户的日常安排，提供时间管理建议</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. 社交与关系 -->
+            <div class="feature-detail-card">
+                <div class="feature-detail-header">
+                    <div class="feature-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+                        </svg>
+                    </div>
+                    <h3>社交与关系</h3>
+                </div>
+                <div class="example-dialog">
+                    <div class="dialog-section">
+                        <span class="dialog-label">您可以这样问：</span>
+                        <div class="dialog-content">
+                            <p>"怎么给孙子打电话？"</p>
+                            <p>"有哪些适合老年人的社交活动？"</p>
+                        </div>
+                    </div>
+                    <div class="dialog-section">
+                        <span class="dialog-label">乐伴AI会：</span>
+                        <ul class="workflow-list">
+                            <li>指导用户使用手机等设备进行社交互动</li>
+                            <li>推荐社区活动，促进用户与家人朋友的联系</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6. 兴趣与爱好 -->
+            <div class="feature-detail-card">
+                <div class="feature-detail-header">
+                    <div class="feature-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9 8 9.67 8 10.5 7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
+                        </svg>
+                    </div>
+                    <h3>兴趣与爱好</h3>
+                </div>
+                <div class="example-dialog">
+                    <div class="dialog-section">
+                        <span class="dialog-label">您可以这样问：</span>
+                        <div class="dialog-content">
+                            <p>"我想学画画，有什么入门建议吗？"</p>
+                            <p>"推荐几本适合老年人阅读的书籍。"</p>
+                        </div>
+                    </div>
+                    <div class="dialog-section">
+                        <span class="dialog-label">乐伴AI会：</span>
+                        <ul class="workflow-list">
+                            <li>提供学习资源和步骤，支持用户培养新兴趣</li>
+                            <li>推荐适合的书籍、课程，丰富用户的业余生活</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 学习路径改为使用指南 -->
+    <section id="path" class="learning-path">
+        <h2 class="section-title">轻松开始使用</h2>
+        <div class="path-steps">
+            <div class="step-card">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h3>点击开始</h3>
+                    <p>轻点按钮，开启温暖对话</p>
+                </div>
+            </div>
+            <div class="step-card">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h3>自然交谈</h3>
+                    <p>用您熟悉的方言轻松交流</p>
+                </div>
+            </div>
+            <div class="step-card">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h3>贴心陪伴</h3>
+                    <p>聊天、关怀、生活助手一应俱全</p>
+                </div>
+            </div>
+            <div class="step-card">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <h3>温暖相伴</h3>
+                    <p>让每一天都充满欢声笑语</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <script src="scripts/upload.js"></script>
+    <script>
+        // 初始化聊天客户端
+        let chatClient = null;
+
+        function initChat() {
+            if (!chatClient) {
+                chatClient = new CozeWebSDK.WebChatClient({
+                    config: {
+                        bot_id: '7453753716710572044',
+                    },
+                    componentProps: {
+                        title: 'AI语音助手',
+                        position: 'right',
+                        defaultOpen: true,
+                    },
+                });
+            } else {
+                chatClient.open();
+            }
+        }
+
+        // 绑定点击事件到导航栏按钮
+        document.querySelector('.nav-button').addEventListener('click', initChat);
+
+        // 导航栏滚动效果
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('.nav-container');
+            if (window.scrollY > 50) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+        });
+
+        // 滚动动画
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, {
+            threshold: 0.1
+        });
+        
+        document.querySelectorAll('.step-card').forEach(card => {
+            observer.observe(card);
+        });
+    </script>
+</body>
+</html> 

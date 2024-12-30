@@ -1,0 +1,26 @@
+.dashboard-card {
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  transition: all 0.3s ease;
+  padding: 20px;
+  margin: 12px;
+  
+  /* 添加悬停效果 */
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(75, 163, 226, 0.12);
+  }
+  
+  /* 添加内容布局 */
+  .card-header {
+    margin-bottom: 16px;
+    font-weight: 600;
+    color: #2C5282;
+  }
+  
+  .card-content {
+    color: #4A5568;
+    line-height: 1.6;
+  }
+} 

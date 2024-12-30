@@ -1,0 +1,35 @@
+@mixin mobile {
+  @media (max-width: 767px) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (min-width: 768px) and (max-width: 1199px) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media (min-width: 1200px) {
+    @content;
+  }
+}
+
+// 使用示例
+.container {
+  @include mobile {
+    padding: 16px;
+    grid-template-columns: 1fr;
+  }
+  
+  @include tablet {
+    padding: 24px;
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  @include desktop {
+    padding: 32px;
+    grid-template-columns: repeat(3, 1fr);
+  }
+} 
