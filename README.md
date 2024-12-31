@@ -1,4 +1,4 @@
-# 乐伴AI (Happy Companion AI)
+# 这是为字节跳动Mars Code大赛制作的--乐伴AI (Happy Companion AI)
 
 ## 项目简介 / Project Overview
 
